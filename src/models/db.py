@@ -30,7 +30,7 @@ class Ticket(ormar.Model):
     id: int = ormar.Integer(primary_key=True)
     created_at: dt.datetime = ormar.DateTime(default=dt.datetime.utcnow)
     is_winner: bool = ormar.Boolean(default=False, nullable=False)
-    user_id: Optional[User] = ormar.ForeignKey(User)
+    user_id: int = ormar.Integer(default=None)
     lottery_id: int = ormar.Integer(default=None)
 
 
@@ -40,7 +40,7 @@ class Lottery(ormar.Model):
 
     id: int = ormar.Integer(primary_key=True)
     date_created: dt.datetime = ormar.DateTime(default=dt.datetime.utcnow)
-    winning_ticket: Optional[Ticket] = ormar.ForeignKey(Ticket)
+    winning_ticket_id: int = ormar.Integer(default=None)
 
 
 engine = sqlalchemy.create_engine(settings.db_url)
