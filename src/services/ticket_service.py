@@ -9,3 +9,7 @@ class TicketService:
     @staticmethod
     async def create_ticket(ticket: Ticket):
         return await ticket.save()
+
+    @staticmethod
+    async def query_winning_ticket(day: str) -> Ticket:
+        return await Ticket.objects.filter(Ticket.created_at == day, Ticket.is_winner == True).get()

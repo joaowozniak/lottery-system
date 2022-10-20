@@ -1,10 +1,10 @@
+from src.utils.constants import Constants
+from src.config.settings import settings
+from typing import Optional
+import datetime
 import databases
 import sqlalchemy
-from typing import Optional
 import ormar
-import datetime as dt
-
-from src.config.settings import settings
 
 database = databases.Database(settings.db_url)
 metadata = sqlalchemy.MetaData()
@@ -23,24 +23,24 @@ class User(ormar.Model):
     username: str = ormar.String(max_length=128, unique=True, nullable=False)
 
 
-class Ticket(ormar.Model):
-    class Meta(BaseMeta):
-        tablename = "tickets"
-
-    id: int = ormar.Integer(primary_key=True)
-    created_at: dt.datetime = ormar.DateTime(default=dt.datetime.utcnow)
-    is_winner: bool = ormar.Boolean(default=False, nullable=False)
-    user_id: int = ormar.Integer(default=None)
-    lottery_id: int = ormar.Integer(default=None)
-
-
 class Lottery(ormar.Model):
     class Meta(BaseMeta):
         tablename = "lotteries"
 
     id: int = ormar.Integer(primary_key=True)
-    date_created: dt.datetime = ormar.DateTime(default=dt.datetime.utcnow)
-    winning_ticket_id: int = ormar.Integer(default=None)
+    created_at: str = ormar.String(max_length=128, default=datetime.datetime.today().strftime(Constants.DATE_FORMAT))
+    winning_ticket_id: int = ormar.Integer(default=0)
+
+
+class Ticket(ormar.Model):
+    class Meta(BaseMeta):
+        tablename = "tickets"
+
+    id: int = ormar.Integer(primary_key=True)
+    created_at: str = ormar.String(max_length=128, default=datetime.datetime.today().strftime(Constants.DATE_FORMAT))
+    is_winner: bool = ormar.Boolean(default=False, nullable=False)
+    user: Optional[User] = ormar.ForeignKey(User)
+    lottery: Optional[Lottery] = ormar.ForeignKey(Lottery)
 
 
 engine = sqlalchemy.create_engine(settings.db_url)
