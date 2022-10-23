@@ -9,10 +9,10 @@ from src.services.user_service import UserService
 from src.services.scheduler_service import SchedulerService
 
 app = FastAPI(title="Lottery-sys")
-lottery_service = LotteryService
-ticket_service = TicketService
-bet_service = BetService
-user_service = UserService
+lottery_service = LotteryService()
+ticket_service = TicketService()
+bet_service = BetService()
+user_service = UserService()
 
 
 @app.get("/users", response_model=List[User])
@@ -83,6 +83,7 @@ async def startup():
 async def schedule_lottery_restart():
     print("hello")
     # await bet_service.place_bet("myuser")
+
     await lottery_service.manage_lottery_winner()
     print("bye")
     print("\n")

@@ -40,8 +40,8 @@ class Ticket(ormar.Model):
     id: int = ormar.Integer(primary_key=True)
     created_at: str = ormar.String(max_length=128, default=datetime.datetime.today().strftime(Constants.DATE_FORMAT))
     is_winner: bool = ormar.Boolean(default=False, nullable=False)
-    user: Optional[User] = ormar.ForeignKey(User, skip_reverse=True)
-    lottery: Optional[Lottery] = ormar.ForeignKey(Lottery, skip_reverse=True)
+    user: Optional[User] = ormar.ForeignKey(User)
+    lottery: Optional[Lottery] = ormar.ForeignKey(Lottery)
 
 
 engine = sqlalchemy.create_engine(settings.db_url)
