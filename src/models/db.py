@@ -28,7 +28,10 @@ class Lottery(ormar.Model):
         tablename = "lotteries"
 
     id: int = ormar.Integer(primary_key=True)
-    created_at: str = ormar.String(max_length=128, default=datetime.datetime.today().strftime(Constants.DATE_FORMAT))
+    created_at: str = ormar.String(
+        max_length=128,
+        default=datetime.datetime.today().strftime(Constants.DATE_FORMAT),
+    )
     winning_ticket_id: int = ormar.Integer(default=0)
     is_active: bool = ormar.Boolean(default=True)
 
@@ -38,7 +41,10 @@ class Ticket(ormar.Model):
         tablename = "tickets"
 
     id: int = ormar.Integer(primary_key=True)
-    created_at: str = ormar.String(max_length=128, default=datetime.datetime.today().strftime(Constants.DATE_FORMAT))
+    created_at: str = ormar.String(
+        max_length=128,
+        default=datetime.datetime.today().strftime(Constants.DATE_FORMAT),
+    )
     is_winner: bool = ormar.Boolean(default=False, nullable=False)
     user: Optional[User] = ormar.ForeignKey(User)
     lottery: Optional[Lottery] = ormar.ForeignKey(Lottery)

@@ -5,7 +5,6 @@ from src.models.db import Ticket, User, Lottery
 
 
 class BetService:
-
     async def place_bet(self, username: str) -> JSONResponse:
         """
         Submits lottery ballot to ongoing lottery

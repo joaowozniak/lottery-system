@@ -13,11 +13,13 @@ class LotteryService:
         :param day:
         :return:
         """
-        if day == 'all':
+        if day == "all":
             return await Lottery.objects.select_related("tickets").all()
         if not day:
             return await Lottery.objects.select_related("tickets").get(
-                Lottery.created_at == datetime.datetime.today().strftime(Constants.DATE_FORMAT))
+                Lottery.created_at
+                == datetime.datetime.today().strftime(Constants.DATE_FORMAT)
+            )
         return await Lottery.objects.get(Lottery.created_at == day)
 
     @staticmethod
@@ -46,7 +48,9 @@ class LotteryService:
         :return:
         """
         today = datetime.datetime.today()
-        return await Lottery.objects.get_or_create(created_at=today.strftime(Constants.DATE_FORMAT))
+        return await Lottery.objects.get_or_create(
+            created_at=today.strftime(Constants.DATE_FORMAT)
+        )
 
     @staticmethod
     async def new_lottery():
@@ -56,7 +60,9 @@ class LotteryService:
         """
         today = datetime.datetime.now()
         tomorrow = today + datetime.timedelta(days=1)
-        return await Lottery.objects.get_or_create(created_at=tomorrow.strftime(Constants.DATE_FORMAT), is_active=True)
+        return await Lottery.objects.get_or_create(
+            created_at=tomorrow.strftime(Constants.DATE_FORMAT), is_active=True
+        )
 
     @staticmethod
     async def get_current_lottery():
@@ -64,8 +70,10 @@ class LotteryService:
         Returns current active lottery
         :return: Lottery
         """
-        return await Lottery.objects.get_or_none(created_at=datetime.datetime.now().strftime(Constants.DATE_FORMAT),
-                                                 is_active=True)
+        return await Lottery.objects.get_or_none(
+            created_at=datetime.datetime.now().strftime(Constants.DATE_FORMAT),
+            is_active=True,
+        )
 
     @staticmethod
     async def get_closing_lottery() -> Lottery:
@@ -75,7 +83,8 @@ class LotteryService:
         """
         return await Lottery.objects.select_related("tickets").get_or_none(
             created_at=datetime.datetime.now().strftime(Constants.DATE_FORMAT),
-            is_active=True)
+            is_active=True,
+        )
 
     async def manage_lottery_winner(self) -> None:
         """
@@ -101,8 +110,12 @@ class LotteryService:
         :param closing_lottery: Lottery instance to close
         :return:
         """
-        print(f"Verifying tickets submitted for closing lottery {closing_lottery.id}...")
-        tickets = await Ticket.objects.filter(created_at=closing_lottery.created_at).get_or_none()
+        print(
+            f"Verifying tickets submitted for closing lottery {closing_lottery.id}..."
+        )
+        tickets = await Ticket.objects.filter(
+            created_at=closing_lottery.created_at
+        ).get_or_none()
 
         if tickets is not None:
             print(f"Found {len(tickets)} submitted.")

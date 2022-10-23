@@ -9,8 +9,10 @@ from src.services.ticket_service import TicketService
 from src.services.user_service import UserService
 from src.services.scheduler_service import SchedulerService
 
-app = FastAPI(title="Lottery-system",
-              description="Lottery system that allows users to submit lottery ballots for any lottery")
+app = FastAPI(
+    title="Lottery-system",
+    description="Lottery system that allows users to submit lottery ballots for any lottery",
+)
 
 lottery_service = LotteryService()
 ticket_service = TicketService()
@@ -18,29 +20,32 @@ bet_service = BetService()
 user_service = UserService()
 
 
-@app.post("/users",
-          summary="Create new users",
-          description="Allow user to participate in lottery",
-          name="POST new user to lottery-system"
-          )
+@app.post(
+    "/users",
+    summary="Create new users",
+    description="Allow user to participate in lottery",
+    name="POST new user to lottery-system",
+)
 async def create_user(user: User) -> JSONResponse:
     return await user_service.create_user(user)
 
 
-@app.post("/bet",
-          summary="Submit new lottery ballot",
-          description="Allow user to submit lottery ballot",
-          name="POST new bet to Storage-Api"
-          )
+@app.post(
+    "/bet",
+    summary="Submit new lottery ballot",
+    description="Allow user to submit lottery ballot",
+    name="POST new bet to Storage-Api",
+)
 async def place_bet(username: str) -> JSONResponse:
     return await bet_service.place_bet(username)
 
 
-@app.get("/winner",
-         summary="Get winner ticket",
-         description="Allow user to query wining ballot for date",
-         name="GET winning ticker of Storage-Api"
-         )
+@app.get(
+    "/winner",
+    summary="Get winner ticket",
+    description="Allow user to query wining ballot for date",
+    name="GET winning ticker of Storage-Api",
+)
 async def get_day_winner_ticket(day: str) -> JSONResponse:
     return await ticket_service.query_winning_ticket(day)
 
@@ -54,8 +59,9 @@ async def startup():
     await schedule_lottery_restart()
 
 
-@SchedulerService.lottery_scheduler(refresh_rate_in_seconds=settings.refresh_rate,
-                                    execution_hour=settings.exec_hour)
+@SchedulerService.lottery_scheduler(
+    refresh_rate_in_seconds=settings.refresh_rate, execution_hour=settings.exec_hour
+)
 async def schedule_lottery_restart():
     await lottery_service.manage_lottery_winner()
 

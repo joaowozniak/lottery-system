@@ -29,8 +29,9 @@ class TicketService:
         :param day: Lottery day
         :return: Winning ticket of that day
         """
-        winner = await Ticket.objects.filter(Ticket.created_at == day,
-                                             Ticket.is_winner == True).get_or_none()
+        winner = await Ticket.objects.filter(
+            Ticket.created_at == day, Ticket.is_winner == True
+        ).get_or_none()
 
         if winner is not None:
             await winner.load()

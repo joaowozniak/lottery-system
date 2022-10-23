@@ -6,10 +6,8 @@ from src.services.lottery_service import LotteryService
 
 
 class SchedulerService:
-
     @staticmethod
-    def lottery_scheduler(refresh_rate_in_seconds: float,
-                          execution_hour: str):
+    def lottery_scheduler(refresh_rate_in_seconds: float, execution_hour: str):
         """
         Custom-made wrapper to schedule lottery restart between days
         :param refresh_rate_in_seconds: Rate at which it checks if it's execution time in seconds
@@ -18,14 +16,15 @@ class SchedulerService:
         """
 
         def decorator(func):
-
             @wraps(func)
             async def wrapped() -> None:
                 async def loop() -> None:
                     while True:
                         current_time = time.strftime("%H:%M", time.localtime())
-                        if current_time == execution_hour and \
-                                await LotteryService.get_current_lottery() is not None:
+                        if (
+                            current_time == execution_hour
+                            and await LotteryService.get_current_lottery() is not None
+                        ):
                             print("No active lottery found")
                             try:
                                 await func()
