@@ -9,7 +9,7 @@ services:
       - "8008:8000"
     environment:
       - DATABASE_URL=postgresql://lottery_admin:lottery_password@db:5432/lottery_db
-      - EXECUTION_HOUR=01:49
+      - EXECUTION_HOUR=13:59
       - REFRESH_RATE=5
     depends_on:
       - db

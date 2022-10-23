@@ -1,4 +1,4 @@
-from src.models.db import Lottery
+from src.models.db import Lottery, Ticket
 from src.utils.constants import Constants
 from typing import Optional
 import datetime
@@ -41,11 +41,16 @@ class LotteryService:
 
     @staticmethod
     async def assign_winner(closing_lottery: Lottery):
-        rand_winner_ticket_id = random.randint(0, len(closing_lottery.tickets))
-        closing_lottery.winning_ticket_id = rand_winner_ticket_id
+        tickets = await Ticket.objects.filter(created_at=closing_lottery.created_at).all()
+        rand_winner_ticket_id = random.randint(0, len(tickets))
+        winner = tickets[rand_winner_ticket_id]
+
+        winner.is_winner = True
+        await winner.upsert()
+
         closing_lottery.is_active = False
-        print(closing_lottery)
-        await closing_lottery.update()
+        closing_lottery.winning_ticket_id = winner.id
+        await closing_lottery.upsert()
 
     async def manage_lottery_winner(self) -> None:
         # get closing lottery id
