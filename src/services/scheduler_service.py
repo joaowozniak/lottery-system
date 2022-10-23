@@ -10,6 +10,13 @@ class SchedulerService:
     @staticmethod
     def lottery_scheduler(refresh_rate_in_seconds: float,
                           execution_hour: str):
+        """
+        Custom-made wrapper to schedule lottery restart between days
+        :param refresh_rate_in_seconds: Rate at which it checks if it's execution time in seconds
+        :param execution_hour: Restart execution hour with format "HH:MM"
+        :return: Function wrapper
+        """
+
         def decorator(func):
 
             @wraps(func)

@@ -6,14 +6,29 @@ from src.models.db import Ticket, User
 class TicketService:
     @staticmethod
     async def get_ticket(ticket_id: int) -> Ticket:
+        """
+        Util function
+        :param ticket_id:
+        :return:
+        """
         return await Ticket.objects.get(Ticket.id == ticket_id)
 
     @staticmethod
     async def create_ticket(ticket: Ticket):
+        """
+        Util function
+        :param ticket:
+        :return:
+        """
         return await ticket.save()
 
     @staticmethod
     async def query_winning_ticket(day: str) -> JSONResponse:
+        """
+        Returns winning ticket of any given day lottery
+        :param day: Lottery day
+        :return: Winning ticket of that day
+        """
         winner = await Ticket.objects.filter(Ticket.created_at == day,
                                              Ticket.is_winner == True).get_or_none()
 

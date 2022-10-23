@@ -7,6 +7,11 @@ from src.models.db import Ticket, User, Lottery
 class BetService:
 
     async def place_bet(self, username: str) -> JSONResponse:
+        """
+        Submits lottery ballot to ongoing lottery
+        :param username: Unique username
+        :return: Ticket created
+        """
         print("Submitting new bet...")
 
         user = await self.__verify_user(username)
@@ -17,6 +22,11 @@ class BetService:
 
     @staticmethod
     async def __verify_user(username: str) -> User:
+        """
+        User verification in database
+        :param username:
+        :return: User model
+        """
         user = await User.objects.get_or_none(username=username)
 
         if user is None:
@@ -30,6 +40,10 @@ class BetService:
 
     @staticmethod
     async def __verify_lottery() -> Lottery:
+        """
+        Lottery verification in database
+        :return: Lottery model
+        """
         lottery = await Lottery.objects.get_or_none(is_active=True)
 
         if lottery is None:

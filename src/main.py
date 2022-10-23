@@ -9,24 +9,38 @@ from src.services.ticket_service import TicketService
 from src.services.user_service import UserService
 from src.services.scheduler_service import SchedulerService
 
-app = FastAPI(title="Lottery-sys")
+app = FastAPI(title="Lottery-system",
+              description="Lottery system that allows users to submit lottery ballots for any lottery")
+
 lottery_service = LotteryService()
 ticket_service = TicketService()
 bet_service = BetService()
 user_service = UserService()
 
 
-@app.post("/users")
-async def create_user(user: User):
+@app.post("/users",
+          summary="Create new users",
+          description="Allow user to participate in lottery",
+          name="POST new user to lottery-system"
+          )
+async def create_user(user: User) -> JSONResponse:
     return await user_service.create_user(user)
 
 
-@app.post("/bet")
-async def place_bet(username: str):
+@app.post("/bet",
+          summary="Submit new lottery ballot",
+          description="Allow user to submit lottery ballot",
+          name="POST new bet to Storage-Api"
+          )
+async def place_bet(username: str) -> JSONResponse:
     return await bet_service.place_bet(username)
 
 
-@app.get("/winner")
+@app.get("/winner",
+         summary="Get winner ticket",
+         description="Allow user to query wining ballot for date",
+         name="GET winning ticker of Storage-Api"
+         )
 async def get_day_winner_ticket(day: str) -> JSONResponse:
     return await ticket_service.query_winning_ticket(day)
 
@@ -37,8 +51,6 @@ async def startup():
     if not database.is_connected:
         await database.connect()
         await lottery_service.setup_lottery()
-    user = User(username="myuser")
-    await user_service.create_user(user)
     await schedule_lottery_restart()
 
 
@@ -54,8 +66,9 @@ async def shutdown():
         await database.disconnect()
 
 
-############################################################
-
+##############################################
+# Utils Endpoints
+##############################################
 @app.get("/users", response_model=List[User])
 async def read_users():
     return await user_service.get_users()

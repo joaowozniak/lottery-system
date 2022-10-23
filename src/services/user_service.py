@@ -7,10 +7,19 @@ from src.models.db import User
 class UserService:
     @staticmethod
     def get_users() -> List[User]:
+        """
+        Util function
+        :return:
+        """
         return User.objects.all()
 
     @staticmethod
     async def create_user(user: User) -> JSONResponse:
+        """
+        Creates new user in lottery system and saves it to database
+        :param user: User's username
+        :return:
+        """
         print("Creating new user...")
         user_in_db = await User.objects.filter(username=user.username).get_or_none()
 
