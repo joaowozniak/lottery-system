@@ -8,8 +8,9 @@ class BetService:
 
     @staticmethod
     async def place_bet(username: str):
-        user = await User.objects.get_or_create(username=username)
+        user = await User.objects.get(username=username)
         await user.load()
+        print(user.__dict__)
 
         lottery = await Lottery.objects.get(created_at=datetime.datetime.today().strftime(Constants.DATE_FORMAT))
         await lottery.load()

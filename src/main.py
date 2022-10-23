@@ -1,13 +1,48 @@
+from typing import Optional, List
 from fastapi import FastAPI
+from src.config.settings import settings
+from src.models.db import database, Ticket, User, Lottery
+from src.services.bet_service import BetService
 from src.services.lottery_service import LotteryService
 from src.services.ticket_service import TicketService
-from src.services.bet_service import BetService
-from src.models.db import database, Ticket
+from src.services.user_service import UserService
+from src.services.scheduler_service import SchedulerService
 
 app = FastAPI(title="Lottery-sys")
 lottery_service = LotteryService
 ticket_service = TicketService
 bet_service = BetService
+user_service = UserService
+
+
+@app.get("/users", response_model=List[User])
+async def read_users():
+    return await user_service.get_users()
+
+
+@app.post("/users", response_model=User)
+async def create_user(user: User):
+    return await user_service.create_user(user)
+
+
+@app.get("/lottery")
+async def get_lottery(day: Optional[str]):
+    return await lottery_service.get_lottery(day)
+
+
+@app.post("/lottery", response_model=Lottery)
+async def create_lottery(lottery: Lottery):
+    return await lottery_service.create_lottery(lottery)
+
+
+@app.get("/ticket", response_model=Ticket)
+async def read_ticket(ticket_id: int):
+    return await ticket_service.get_ticket(ticket_id)
+
+
+@app.post("/ticket", response_model=Ticket)
+async def create_ticket(ticket: Ticket):
+    return await ticket_service.create_ticket(ticket)
 
 
 @app.post("/bet")
@@ -20,11 +55,37 @@ async def get_day_winner_ticket(day: str):
     return await ticket_service.query_winning_ticket(day)
 
 
+async def draw_lottery_winner():
+    print("Drawing!")
+    user = User(username="myuser")
+    await user_service.create_user(user)
+    return await bet_service.place_bet("myuser")
+
+
+@app.get("/")
+def ping():
+    return "pong"
+
+
 @app.on_event("startup")
 async def startup():
+    print("Starting application...")
     if not database.is_connected:
         await database.connect()
         await lottery_service.setup_lottery()
+    user = User(username="myuser")
+    await user_service.create_user(user)
+    await schedule_lottery_restart()
+
+
+@SchedulerService.lottery_scheduler(refresh_rate_in_seconds=settings.refresh_rate,
+                                    execution_hour=settings.exec_hour)
+async def schedule_lottery_restart():
+    print("hello")
+    # await bet_service.place_bet("myuser")
+    await lottery_service.manage_lottery_winner()
+    print("bye")
+    print("\n")
 
 
 @app.on_event("shutdown")
