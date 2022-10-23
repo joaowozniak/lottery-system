@@ -1,19 +1,42 @@
+from fastapi import HTTPException, status
+from fastapi.responses import JSONResponse
 from src.services.ticket_service import TicketService
 from src.models.db import Ticket, User, Lottery
-from src.utils.constants import Constants
-import datetime
 
 
 class BetService:
 
-    @staticmethod
-    async def place_bet(username: str):
-        user = await User.objects.get(username=username)
-        await user.load()
-        print(user.__dict__)
+    async def place_bet(self, username: str) -> JSONResponse:
+        print("Submitting new bet...")
 
-        lottery = await Lottery.objects.get(created_at=datetime.datetime.today().strftime(Constants.DATE_FORMAT))
-        await lottery.load()
-
+        user = await self.__verify_user(username)
+        lottery = await self.__verify_lottery()
         ticket = Ticket(user=user, lottery=lottery)
+
         return await TicketService.create_ticket(ticket)
+
+    @staticmethod
+    async def __verify_user(username: str) -> User:
+        user = await User.objects.get_or_none(username=username)
+
+        if user is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"FAILED: Username {username} not found. Register first.",
+            )
+
+        await user.load()
+        return user
+
+    @staticmethod
+    async def __verify_lottery() -> Lottery:
+        lottery = await Lottery.objects.get_or_none(is_active=True)
+
+        if lottery is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Lottery not active.",
+            )
+
+        await lottery.load()
+        return lottery

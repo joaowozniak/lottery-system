@@ -18,7 +18,7 @@ class SchedulerService:
                     while True:
                         current_time = time.strftime("%H:%M", time.localtime())
                         if current_time == execution_hour and \
-                                await LotteryService.get_current_lottery() is None:
+                                await LotteryService.get_current_lottery() is not None:
                             print("No active lottery found")
                             try:
                                 await func()

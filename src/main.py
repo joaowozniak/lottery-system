@@ -1,5 +1,6 @@
 from typing import Optional, List
 from fastapi import FastAPI
+from fastapi.responses import JSONResponse
 from src.config.settings import settings
 from src.models.db import database, Ticket, User, Lottery
 from src.services.bet_service import BetService
@@ -15,14 +16,49 @@ bet_service = BetService()
 user_service = UserService()
 
 
+@app.post("/users")
+async def create_user(user: User):
+    return await user_service.create_user(user)
+
+
+@app.post("/bet")
+async def place_bet(username: str):
+    return await bet_service.place_bet(username)
+
+
+@app.get("/winner")
+async def get_day_winner_ticket(day: str) -> JSONResponse:
+    return await ticket_service.query_winning_ticket(day)
+
+
+@app.on_event("startup")
+async def startup():
+    print("Starting application...")
+    if not database.is_connected:
+        await database.connect()
+        await lottery_service.setup_lottery()
+    user = User(username="myuser")
+    await user_service.create_user(user)
+    await schedule_lottery_restart()
+
+
+@SchedulerService.lottery_scheduler(refresh_rate_in_seconds=settings.refresh_rate,
+                                    execution_hour=settings.exec_hour)
+async def schedule_lottery_restart():
+    await lottery_service.manage_lottery_winner()
+
+
+@app.on_event("shutdown")
+async def shutdown():
+    if database.is_connected:
+        await database.disconnect()
+
+
+############################################################
+
 @app.get("/users", response_model=List[User])
 async def read_users():
     return await user_service.get_users()
-
-
-@app.post("/users", response_model=User)
-async def create_user(user: User):
-    return await user_service.create_user(user)
 
 
 @app.get("/lottery")
@@ -43,53 +79,3 @@ async def read_ticket(ticket_id: int):
 @app.post("/ticket", response_model=Ticket)
 async def create_ticket(ticket: Ticket):
     return await ticket_service.create_ticket(ticket)
-
-
-@app.post("/bet")
-async def place_bet(username: str) -> Ticket:
-    return await bet_service.place_bet(username)
-
-
-@app.get("/winner")
-async def get_day_winner_ticket(day: str):
-    return await ticket_service.query_winning_ticket(day)
-
-
-async def draw_lottery_winner():
-    print("Drawing!")
-    user = User(username="myuser")
-    await user_service.create_user(user)
-    return await bet_service.place_bet("myuser")
-
-
-@app.get("/")
-def ping():
-    return "pong"
-
-
-@app.on_event("startup")
-async def startup():
-    print("Starting application...")
-    if not database.is_connected:
-        await database.connect()
-        await lottery_service.setup_lottery()
-    user = User(username="myuser")
-    await user_service.create_user(user)
-    await schedule_lottery_restart()
-
-
-@SchedulerService.lottery_scheduler(refresh_rate_in_seconds=settings.refresh_rate,
-                                    execution_hour=settings.exec_hour)
-async def schedule_lottery_restart():
-    print("hello")
-    # await bet_service.place_bet("myuser")
-
-    await lottery_service.manage_lottery_winner()
-    print("bye")
-    print("\n")
-
-
-@app.on_event("shutdown")
-async def shutdown():
-    if database.is_connected:
-        await database.disconnect()
