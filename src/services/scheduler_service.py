@@ -1,6 +1,5 @@
 import asyncio
 import time
-from asyncio import ensure_future
 from functools import wraps
 from src.services.lottery_service import LotteryService
 
@@ -22,8 +21,8 @@ class SchedulerService:
                     while True:
                         current_time = time.strftime("%H:%M", time.localtime())
                         if (
-                            current_time == execution_hour
-                            and await LotteryService.get_current_lottery() is not None
+                                current_time == execution_hour
+                                and await LotteryService.get_current_lottery() is not None
                         ):
                             print("Found active lottery")
                             try:
@@ -32,7 +31,7 @@ class SchedulerService:
                                 raise exc
                         await asyncio.sleep(refresh_rate_in_seconds)
 
-                ensure_future(loop())
+                asyncio.create_task(loop())
 
             return wrapped
 

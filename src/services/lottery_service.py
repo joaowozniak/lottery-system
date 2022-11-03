@@ -120,7 +120,7 @@ class LotteryService:
 
         if len(tickets) > 0:
             print(f"Found {len(tickets)} submitted.")
-            rand_winner_ticket_id = random.randint(0, len(tickets))
+            rand_winner_ticket_id = random.randint(0, len(tickets)-1)
             winner = tickets[rand_winner_ticket_id]
             winner.is_winner = True
             await winner.upsert()
