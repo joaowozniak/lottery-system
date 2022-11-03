@@ -113,11 +113,12 @@ class LotteryService:
         print(
             f"Verifying tickets submitted for closing lottery {closing_lottery.id}..."
         )
+
         tickets = await Ticket.objects.filter(
             created_at=closing_lottery.created_at
-        ).get_or_none()
+        ).all()
 
-        if tickets is not None:
+        if len(tickets) > 0:
             print(f"Found {len(tickets)} submitted.")
             rand_winner_ticket_id = random.randint(0, len(tickets))
             winner = tickets[rand_winner_ticket_id]

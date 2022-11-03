@@ -25,7 +25,7 @@ class SchedulerService:
                             current_time == execution_hour
                             and await LotteryService.get_current_lottery() is not None
                         ):
-                            print("No active lottery found")
+                            print("Found active lottery")
                             try:
                                 await func()
                             except Exception as exc:
